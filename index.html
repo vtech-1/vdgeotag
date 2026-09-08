@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a7a3c">
+    <meta name="description" content="VD GeoTag - Vijay Dairy Field Supervisor App">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="VD GeoTag">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>VD GeoTag</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./Logo.png">
+    <link rel="icon" type="image/png" href="./Logo.png" sizes="192x192">
+
+    <!-- CSS modules -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="container">
+
+    <!-- ═══════════════════════════════════════════════════════
+         PAGE 1: LOGIN
+    ════════════════════════════════════════════════════════ -->
+    <div id="page-login" class="page">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="login-logo">
+                    <img src="LOGO INSIDE.png" alt="Vijay Dairy" class="login-logo-img"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <div class="login-logo-icon" style="display:none">VD</div>
+                    <div class="login-app-name">VD GeoTag</div>
+                    <div class="login-subtitle">Vijay Dairy Field Management</div>
+                </div>
+
+                <div class="login-form">
+                    <div class="login-error" id="loginError"></div>
+
+                    <div class="form-group">
+                        <label>Employee ID</label>
+                        <input type="text" id="loginId" placeholder="Enter your 4-digit ID"
+                               inputmode="numeric" maxlength="4" autocomplete="username">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPw" placeholder="Enter password"
+                               autocomplete="current-password">
+                    </div>
+
+                    <div class="login-buttons">
+                        <button class="btn btn-primary btn-block" id="loginBtn">LOGIN</button>
+                        <button class="btn btn-outline btn-block btn-small" id="installBtn"
+                                style="display:none; color: var(--primary);">⬇️ Install App</button>
+                    </div>
+                </div>
+
+                <div class="login-hint">
+                    First login: password = your ID number
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PAGE 2: FORCE CHANGE PASSWORD
+    ════════════════════════════════════════════════════════ -->
+    <div id="page-change-pw" class="page">
+        <div class="change-pw-container">
+            <div class="change-pw-box">
+                <div class="change-pw-title">🔐 Set New Password</div>
+                <div class="change-pw-desc">
+                    Your first login requires a new password. Choose something you'll remember.
+                </div>
+
+                <div class="login-error" id="changePwError"></div>
+
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" placeholder="Min. 4 characters"
+                           autocomplete="new-password">
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Repeat password"
+                           autocomplete="new-password">
+                </div>
+
+                <button class="btn btn-primary btn-block" id="changePwBtn"
+                        style="margin-top: 16px;">Set Password & Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PAGE 3: SUPERVISOR — Attendance + GPS + Camera + Form
+    ════════════════════════════════════════════════════════ -->
+    <div id="page-supervisor" class="page">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">
+                <div class="header-logo">
+                    <img src="Logo.png" alt="VD" onerror="this.style.display='none'">
+                </div>
+                <div>
+                    <div>VD GeoTag</div>
+                    <div class="header-user" id="headerUser"></div>
+                </div>
+            </div>
+            <div style="display:flex;gap:6px;">
+                <button class="btn btn-secondary btn-small" id="raiseComplaintNavBtn">🎫 Complaint</button>
+                <button class="btn btn-secondary btn-small" id="logoutBtnSup">Logout</button>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- Live Clock -->
+            <div class="clock" id="clockDisplay">Loading...</div>
+
+            <!-- ── GPS STATUS CARD ── -->
+            <div class="card">
+                <div class="card-title">📍 GPS Status</div>
+                <div class="gps-grid">
+                    <div class="gps-item">
+                        <div class="gps-label">Latitude</div>
+                        <div class="gps-value" id="gpsLat">--</div>
+                    </div>
+                    <div class="gps-item">
+                        <div class="gps-label">Longitude</div>
+                        <div class="gps-value" id="gpsLon">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── LOCATION CARD ── -->
+            <div class="card">
+                <div class="card-title">🏘️ Village / Location</div>
+                <div class="location-container">
+                    <div class="location-item">
+                        <div class="location-label">Village / Town</div>
+                        <div class="location-value" id="locVillage">Detecting...</div>
+                    </div>
+                    <div class="location-item">
+                        <div class="location-label">Taluk / District</div>
+                        <div class="location-value" id="locCity">--</div>
+                    </div>
+                    <div class="location-item">
+                        <div class="location-label">State</div>
+                        <div class="location-value" id="locState">--</div>
+                    </div>
+                    <div class="location-loading" id="locationStatus"></div>
+                </div>
+            </div>
+
+            <!-- ── ATTENDANCE TOGGLE ── -->
+            <!-- Big, high-contrast slide switch with OUT/IN text baked into
+                 the track. The switch flips visually the MOMENT it is slid
+                 (so a non-technical user immediately sees it worked), then
+                 the camera opens; the punch only reaches the backend after
+                 the photo is confirmed. If they cancel/retake, it slides
+                 back — see attendance.js handlePunchToggleChange(). -->
+            <div class="card" id="punchActionWrap" style="display:none;">
+                <div class="card-title" style="margin-bottom:12px;">⏰ Attendance</div>
+
+                <label class="punch-toggle-switch" id="punchToggleSwitch">
+                    <input type="checkbox" id="punchToggleInput">
+                    <span class="punch-toggle-track">
+                        <span class="punch-toggle-text punch-toggle-text-on">PUNCHED IN</span>
+                        <span class="punch-toggle-text punch-toggle-text-off">PUNCHED OUT</span>
+                        <span class="punch-toggle-thumb"></span>
+                    </span>
+                </label>
+
+                <div class="punch-toggle-label" id="punchToggleLabel">👉 Slide right to Punch In</div>
+                <div id="punchStatus"></div>
+            </div>
+
+            <!-- ── CAMERA ── -->
+            <div class="camera-section">
+                <div class="card-title" style="margin: 0 0 10px;" id="cameraSectionTitle">📷 Photo Capture</div>
+
+                <!-- Open Camera button (shown until permission granted / camera opened) -->
+                <button class="btn btn-primary btn-block" id="openCameraBtn" style="width:100%;">📷 Open Camera</button>
+
+                <video id="videoFeed" autoplay playsinline style="display:none;"></video>
+
+                <div class="camera-buttons" id="cameraButtons" style="display:none;">
+                    <button class="btn btn-primary" id="flipCameraBtn">🔄 Flip Camera</button>
+                    <button class="btn btn-primary" id="captureBtn">📷 Capture</button>
+                </div>
+
+                <div class="photo-preview" id="photoPreview">
+                    <img id="previewImg" src="" alt="Preview">
+                </div>
+
+                <div class="photo-actions" id="photoActions">
+                    <button class="btn btn-primary" id="confirmPhotoBtn">✓ Confirm</button>
+                    <button class="btn btn-outline" style="color:var(--primary);border-color:var(--primary);" id="retakeBtn">⟲ Retake</button>
+                </div>
+            </div>
+
+            <!-- ── REPORT FORM ── -->
+            <div class="form-section" id="formSection">
+                <div class="card-title">📋 Procurement Field Report</div>
+
+                <div class="form-group">
+                    <label>Date &amp; Shift</label>
+                    <input type="text" id="fieldDateShift" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Village / Location</label>
+                    <input type="text" id="fieldLocation" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Vendor Type <span style="color:#d32f2f;">*</span></label>
+                    <select id="fieldVendorType">
+                        <option value="">-- Select Vendor Type --</option>
+                        <option value="New Vendor">New Vendor</option>
+                        <option value="Existing Vendor">Existing Vendor</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Vendor / VLCC <span style="color:#d32f2f;">*</span></label>
+                    <input type="text" id="fieldVendor" placeholder="Required">
+                </div>
+
+                <div class="form-group">
+                    <label>Route Name</label>
+                    <input type="text" id="fieldRoute" placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                    <label>Dairy Name</label>
+                    <input type="text" id="fieldDairy" placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                    <label>Contact No</label>
+                    <input type="tel" id="fieldContact" placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                    <label>Per Day Milk</label>
+                    <input type="text" id="fieldMilk" placeholder="Optional, e.g. 500">
+                </div>
+
+                <div class="form-group">
+                    <label>Avg Fat / SNF</label>
+                    <input type="text" id="fieldFatSnf" placeholder="Optional, e.g. 4.5/8.5">
+                </div>
+
+                <div class="form-group">
+                    <label>Avg Rate</label>
+                    <input type="text" id="fieldRate" placeholder="Optional, e.g. Rs. 38">
+                </div>
+
+                <div class="form-group">
+                    <label>Additional Incentive</label>
+                    <input type="text" id="fieldAdditional" placeholder="Optional">
+                </div>
+
+                <div class="form-group">
+                    <label>VLCC Salary (Rs. Per Ltr)</label>
+                    <input type="text" id="fieldSalary" placeholder="Optional, e.g. Rs. 0.50">
+                </div>
+
+                <div class="form-group">
+                    <label>Discussion Points</label>
+                    <textarea id="fieldDiscussion" placeholder="Optional"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Remarks</label>
+                    <textarea id="fieldRemarks" placeholder="Optional"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" id="submitBtn" style="width:100%;">✅ Submit Report</button>
+                    <button class="btn btn-primary" id="shareBtn" style="width:100%; display:none;">📤 Share via Telegram</button>
+                </div>
+                <div class="form-actions" id="skipShareWrap" style="display:none; margin-top:6px;">
+                    <button class="btn btn-outline" id="skipShareBtn" style="width:100%; color:var(--primary); border-color:var(--primary);">⟲ New Report (Skip Share)</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span id="dbStatus">Storage: Ready</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PAGE: RAISE / VIEW COMPLAINTS — its own page, reached from
+         the "🎫 Complaint" button next to Logout on the supervisor
+         header (was previously a collapsible card at the bottom of
+         the supervisor page).
+    ════════════════════════════════════════════════════════ -->
+    <div id="page-complaint" class="page">
+        <div class="header">
+            <div class="header-title">
+                <div class="header-logo">
+                    <img src="Logo.png" alt="VD" onerror="this.style.display='none'">
+                </div>
+                <div>
+                    <div>Raise a Complaint</div>
+                    <div class="header-user" id="complaintHeaderUser"></div>
+                </div>
+            </div>
+            <button class="btn btn-secondary btn-small" id="backFromComplaintBtn">← Back</button>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="card">
+                <p style="margin:0 0 12px;color:var(--text-secondary);font-size:12px;">
+                    Report a VLCC issue here instead of calling — it gets a ticket number and
+                    the admin/service team can track it until it's fixed.
+                </p>
+
+                <div id="complaintError" class="login-error"></div>
+
+                <div class="form-group">
+                    <label>VLCC Code <span style="color:#d32f2f;">*</span></label>
+                    <input type="text" id="cmpVlcc" placeholder="e.g. VLCC-1234">
+                </div>
+
+                <div class="form-group">
+                    <label>Location <span style="color:#d32f2f;">*</span></label>
+                    <input type="text" id="cmpLocation" placeholder="Village / Town">
+                </div>
+
+                <div class="form-group">
+                    <label>Issue / Service Needed <span style="color:#d32f2f;">*</span></label>
+                    <textarea id="cmpIssue" placeholder="Describe the current issue"></textarea>
+                </div>
+
+                <button class="btn btn-primary btn-block" id="raiseComplaintBtn">🎫 Submit Complaint</button>
+            </div>
+
+            <!-- My complaints list -->
+            <div class="card">
+                <div class="card-title" style="margin-bottom:8px;">My Complaints</div>
+                <div id="myComplaintsList" style="display:flex;flex-direction:column;gap:8px;">
+                    <div style="text-align:center;color:#888;font-size:12px;padding:10px;">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PAGE 4: ADMIN DASHBOARD
+    ════════════════════════════════════════════════════════ -->
+    <div id="page-admin" class="page">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">
+                <div class="header-logo">
+                    <img src="Logo.png" alt="VD" onerror="this.style.display='none'">
+                </div>
+                <div>
+                    <div>Admin Dashboard</div>
+                    <div class="header-user" id="adminHeaderUser"></div>
+                </div>
+            </div>
+            <div style="display:flex;gap:6px;">
+                <button class="btn btn-secondary btn-small" id="refreshBtn">⟳</button>
+                <button class="btn btn-secondary btn-small" id="logoutBtnAdmin">Logout</button>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Reports</div>
+                    <div class="stat-value" id="totalStats">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Today</div>
+                    <div class="stat-value" id="todayStats">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">This Month</div>
+                    <div class="stat-value" id="monthStats">0</div>
+                </div>
+            </div>
+
+
+            <!-- Tab bar -->
+            <div class="tab-bar">
+                <button class="admin-tab-btn active" data-tab="attendance">🕐 Attendance</button>
+                <button class="admin-tab-btn" data-tab="reports">📋 Reports</button>
+                <button class="admin-tab-btn" data-tab="complaints">🎫 Complaints</button>
+                <button class="admin-tab-btn" data-tab="supervisors">👥 Supervisors</button>
+            </div>
+
+            <!-- ── ATTENDANCE TAB ──
+                 Export sits directly in the filter bar next to Filter, on
+                 every screen size (no breakpoint) — it wraps onto its own
+                 line on very narrow phones same as any other filter-bar
+                 control, via the filter-bar's existing flex-wrap. -->
+            <div class="admin-tab-panel active" id="tab-attendance">
+                <div class="filter-bar">
+                    <div class="form-group" style="margin:0;flex:1;">
+                        <label>From</label>
+                        <input type="date" id="attFilterFrom">
+                    </div>
+                    <div class="form-group" style="margin:0;flex:1;">
+                        <label>To</label>
+                        <input type="date" id="attFilterTo">
+                    </div>
+                    <div class="form-group" style="margin:0;flex:1;">
+                        <label>Supervisor</label>
+                        <select id="attFilterSup">
+                            <option value="">All Supervisors</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-small" onclick="loadAdminAttendance()" style="align-self:flex-end;">Filter</button>
+                    <button class="btn btn-primary btn-small" id="exportAttBtn" style="align-self:flex-end;">📥 Export CSV</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="records-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Supervisor</th>
+                                <th>1st IN</th>
+                                <th>1st OUT</th>
+                                <th>1st Total</th>
+                                <th>2nd IN</th>
+                                <th>2nd OUT</th>
+                                <th>2nd Total</th>
+                                <th>Final Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attTableBody">
+                            <tr><td colspan="9" class="no-records">Select a date range to view attendance</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── REPORTS TAB ── (Export in the filter bar, same as above) -->
+            <div class="admin-tab-panel" id="tab-reports">
+                <div class="filter-bar">
+                    <div class="form-group" style="margin:0;flex:1;">
+                        <label>From</label>
+                        <input type="date" id="repFilterFrom">
+                    </div>
+                    <div class="form-group" style="margin:0;flex:1;">
+                        <label>To</label>
+                        <input type="date" id="repFilterTo">
+                    </div>
+                    <button class="btn btn-primary btn-small" onclick="loadAdminReports()" style="align-self:flex-end;">Filter</button>
+                    <button class="btn btn-primary btn-small" id="exportRepBtn" style="align-self:flex-end;">📥 Export CSV</button>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" id="reportSearch" class="search-input"
+                           placeholder="🔍 Search by vendor, route, location...">
+                </div>
+
+                <div class="table-container">
+                    <table class="records-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Supervisor</th>
+                                <th>Location</th>
+                                <th>Vendor</th>
+                                <th>Shift</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody">
+                            <tr><td colspan="5" class="no-records">No reports found</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="admin-actions">
+                    <button class="btn btn-danger" id="clearDataBtn">⚠️ Clear Local Data</button>
+                </div>
+            </div>
+
+            <!-- ── COMPLAINTS TAB ── (Export in the filter bar, same as the
+                 Attendance/Reports tabs above) -->
+            <div class="admin-tab-panel" id="tab-complaints">
+                <div class="filter-bar">
+                    <div class="form-group" style="margin:0;flex:1;">
+                        <label>Status</label>
+                        <select id="cmpFilterStatus">
+                            <option value="">All Statuses</option>
+                            <option value="OPEN">Open</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="COMPLETED">Completed (awaiting close)</option>
+                            <option value="CLOSED">Closed</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-small" onclick="loadAdminComplaints()" style="align-self:flex-end;">Filter</button>
+                    <button class="btn btn-primary btn-small" id="exportCmpBtn" onclick="exportComplaintsCSV()" style="align-self:flex-end;">📥 Export CSV</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="records-table">
+                        <thead>
+                            <tr>
+                                <th>Ticket</th>
+                                <th>Raised By</th>
+                                <th>Location</th>
+                                <th>Issue</th>
+                                <th>Solved By</th>
+                                <th>Raised On</th>
+                                <th>Closed On</th>
+                                <th>Status</th>
+                                <th style="text-align:center;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminComplaintsBody">
+                            <tr><td colspan="9" class="no-records">⏳ Loading complaints...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── SUPERVISORS TAB ── -->
+            <div class="admin-tab-panel" id="tab-supervisors">
+                <div style="margin-bottom:16px;">
+                    <h3 style="margin:0 0 12px 0;color:var(--text);font-size:16px;">Manage Accounts</h3>
+                    <p style="margin:0;color:var(--text-secondary);font-size:13px;">Add a supervisor or service-team account, edit names, set or view passwords, or remove someone who has left.</p>
+                </div>
+
+                <!-- Add Account -->
+                <div class="card" style="margin-bottom:16px;">
+                    <div class="card-title" style="margin-bottom:10px;">➕ Add New Account</div>
+                    <div id="addSupervisorError" class="login-error"></div>
+                    <div class="form-group">
+                        <label>Employee ID (4 digits)</label>
+                        <input type="text" id="newSupId" placeholder="e.g. 1234" inputmode="numeric" maxlength="4">
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="newSupName" placeholder="e.g. Kumar S">
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select id="newSupRole">
+                            <option value="supervisor">Supervisor (field visits + attendance)</option>
+                            <option value="service">Service Team (resolves complaints)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Password (optional)</label>
+                        <input type="text" id="newSupPassword" placeholder="Leave blank to default to Employee ID">
+                    </div>
+                    <button class="btn btn-primary btn-block" id="addSupervisorBtn">➕ Add Account</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="records-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Password</th>
+                                <th>Last Reset</th>
+                                <th style="text-align:center;width:220px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="supervisorTableBody">
+                            <tr><td colspan="6" style="text-align:center;padding:20px;color:#888;">⏳ Loading accounts...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PAGE 5: SERVICE TEAM — complaint queue only
+    ════════════════════════════════════════════════════════ -->
+    <div id="page-service" class="page">
+        <div class="header">
+            <div class="header-title">
+                <div class="header-logo">
+                    <img src="Logo.png" alt="VD" onerror="this.style.display='none'">
+                </div>
+                <div>
+                    <div>Service Team</div>
+                    <div class="header-user" id="serviceHeaderUser"></div>
+                </div>
+            </div>
+            <div style="display:flex;gap:6px;">
+                <button class="btn btn-secondary btn-small" id="refreshServiceBtn">⟳</button>
+                <button class="btn btn-secondary btn-small" id="logoutBtnService">Logout</button>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="filter-bar">
+                <div class="form-group" style="margin:0;flex:1;">
+                    <label>Status</label>
+                    <select id="svcFilterStatus">
+                        <option value="">Open + In Progress</option>
+                        <option value="OPEN">Open only</option>
+                        <option value="IN_PROGRESS">In Progress only</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="CLOSED">Closed</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary btn-small" onclick="loadServiceComplaints()" style="align-self:flex-end;">Filter</button>
+            </div>
+
+            <div id="serviceComplaintsList" style="display:flex;flex-direction:column;gap:10px;">
+                <div style="text-align:center;color:#888;padding:20px;">⏳ Loading complaints...</div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /.container -->
+
+<!-- ═══════════════════════════════════════════════════════
+     MODAL — Report detail view (admin only)
+════════════════════════════════════════════════════════ -->
+<div id="recordModal" class="modal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="modal-title">Report Details</div>
+
+        <p class="modal-photo-note" id="modalPhotoNote">
+            Photos are shared via Telegram only — not stored in this system.
+        </p>
+
+        <div class="modal-field">
+            <div class="modal-label">Timestamp</div>
+            <div class="modal-value" id="modalTimestamp">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">Shift</div>
+            <div class="modal-value" id="modalShift">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">Location (tap to open map)</div>
+            <div class="modal-value" id="modalLocation">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">GPS Coordinates</div>
+            <div class="modal-value" id="modalGPS">--</div>
+        </div>
+
+        <hr style="margin:14px 0;border:none;border-top:1px solid var(--border);">
+
+        <div class="modal-field">
+            <div class="modal-label">Vendor Type</div>
+            <div class="modal-value" id="modalVendorType">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">Vendor / VLCC</div>
+            <div class="modal-value" id="modalVendor">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">Route Name</div>
+            <div class="modal-value" id="modalRoute">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">Dairy Name</div>
+            <div class="modal-value" id="modalDairy">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">Contact No</div>
+            <div class="modal-value" id="modalContact">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">Per Day Milk (Ltrs)</div>
+            <div class="modal-value" id="modalMilk">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">Avg Fat / SNF</div>
+            <div class="modal-value" id="modalFatSnf">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">Avg Rate</div>
+            <div class="modal-value" id="modalRate">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">Additional Incentive</div>
+            <div class="modal-value" id="modalAdditional">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">VLCC Salary (Rs. Per Ltr)</div>
+            <div class="modal-value" id="modalSalary">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">Discussion Points</div>
+            <div class="modal-value" id="modalDiscussion">--</div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-label">Remarks</div>
+            <div class="modal-value" id="modalRemarks">--</div>
+        </div>
+    </div>
+</div>
+
+<!-- JS modules — ORDER MATTERS -->
+<script src="js/config.js"></script>
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/gps.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/clock.js"></script>
+<script src="js/attendance.js"></script>
+<script src="js/report.js"></script>
+<script src="js/complaints.js"></script>
+<script src="js/service.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/events.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
